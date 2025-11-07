@@ -7,7 +7,7 @@ import Reservation from './Reservation.jsx';
 
 
 //were the components attach to the 'root'<div> in the index.html
-ReactDom.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById('root')).render(
  <React.StrictMode>
  <Router>
     <Routes>

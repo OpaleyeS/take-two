@@ -28,6 +28,7 @@ const Reservation = ( ) => {
 //Handle form submitions, preventing default HTML actions.
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
 
         try{
         const response = await fetch ('http://localhost:5001/api/book',{
@@ -37,9 +38,10 @@ const Reservation = ( ) => {
             },
             body: JSON.stringify({name,email, date: date.toISOString(),service,therapist}),
         });
+    const data = await ressponse.json();    
 // tells the client if the booking was sucessful 
 if(response.ok) {
-    alert(`Booking for ${name} on ${Day.toLocalDateString()} sucessful.We will send a email to confirm`);
+    alert(`Booking for ${name} on ${date.toLocaleDateString()} sucessful.We will send a email to confirm`);
     //Reset Form 
         setName('');
         setEmail('');
@@ -54,6 +56,8 @@ if(response.ok) {
     }catch(error){
         console.error('Error:', error);
         alert('Booking failed.Please try again');
+    }finally{
+        setIsLoading(false);
     }
 };
 return(
@@ -75,7 +79,7 @@ return(
                 <div>
                     <label htmlFor='email'>Email</label>
                     <input
-                        type ='text'
+                        type ='email'
                         id = 'email'
                         value={email} onChange={(e) => setEmail(e.target.value)}
                         required
@@ -86,13 +90,13 @@ return(
                     <div> 
                         <label>Date:</label>
                         <div style={{marginTop: '10px'}}>
-                        <Calender
+                        <Calendar
                             onChange={setDate}
                             value={date}
                             required
                             />
                     </div>   
-                         <p>Selected Date:{date.toLocalDateString()}</p>
+                         <p>Selected Date:{date.toLocaleDateString()}</p>
                     </div>
 
                         <div>

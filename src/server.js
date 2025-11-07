@@ -1,4 +1,4 @@
-const express = required('express');
+const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
@@ -8,8 +8,8 @@ const PORT = 5001;
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(`mongodb+srv://mtsusyap_db_user:BlueAgate90+@cluster1.fwfz6f2.mongodb.net/?appName=Cluster1`,{
-    userNewUrlParser: true,
+mongoose.connect('mongodb+srv://mtsusyap@gmail:BlueAgate90+@cluster1.fwfz6f2.mongodb.net/?appName=Cluster1',{
+    useNewUrlParser: true,
     useUnifiedTopology: true,
 });
 
@@ -21,17 +21,17 @@ const bookingSchema = new mongoose.Schema({
     date:{type: Date, required: true},
     service:{ type: String, required: true},
     therapist: {type: String, required: true},
-    CreatedAt:{type: Date, default: Date.now}
+    createdAt:{type: Date, default: Date.now}
 });
 
 const Booking = mongoose.model('Booking', bookingSchema);
 
 //booking endpoint
-app.post('/api/book', async(req, res) =>{
+app.post('/api/book', async(req, res) => {
     try{
-        const{name, email, date, service, therapist} = req.body;
+        const { name, email, date, service, therapist} = req.body;
     //basic validation
-    if(!name || !email || !date || service || !therapist) {
+    if(!name || !email || !date || !service || !therapist) {
         return res.status(400).json({error: 'All field are required'});    
     } 
 //create new booking
@@ -66,7 +66,7 @@ console.log('New booking created:', booking);
 //get all bookings 
 app.get('/api/bookings', async (req, res) => {
     try{
-        const booking = (await Booking.find()).toSorted({createdAt: -1 });
+        const booking = await Booking.find().sort({createdAt: -1 });
         res.json(bookings);
     }catch(error){
         res.status(500).json({error: 'Failed to fetch bookings'});
