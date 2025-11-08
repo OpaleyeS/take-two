@@ -23,12 +23,13 @@ const Reservation = ( ) => {
     const [date, setDate] = useState(new Date());
     const [service, setService] = useState('');
     const [therapist, setTherapist] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
 //Handle form submitions, preventing default HTML actions.
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
+const handleSubmit =async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
 
         try{
         const response = await fetch ('http://localhost:5001/api/book',{
@@ -38,7 +39,7 @@ const Reservation = ( ) => {
             },
             body: JSON.stringify({name,email, date: date.toISOString(),service,therapist}),
         });
-    const data = await ressponse.json();    
+    const data = await response.json();    
 // tells the client if the booking was sucessful 
 if(response.ok) {
     alert(`Booking for ${name} on ${date.toLocaleDateString()} sucessful.We will send a email to confirm`);
@@ -108,7 +109,7 @@ return(
                                 required
                                 style={{ width: '100%', padding: '8px', marginTop: '5px'}}
                                 >    
-                                    <option value ='' disabled>Select a sservice</option>
+                                    <option value ='' disabled>Select a service</option>
                                         {servicesList.map((serviceOption, index) => (
                                             <option key={index} value={serviceOption}>
                                                 {serviceOption}</option>
@@ -135,16 +136,18 @@ return(
 
                                 <button 
                                     type='submit'
+                                    disabled={isLoading}//to prevent multiple submissions
                                     style={{
                                         padding: '10px 20px',
                                         backgroundColor: '#646cff',
                                         color: 'white',
                                         border: 'none',
                                         borderRadius: '8px',
-                                        cursor: 'pointer'
+                                        cursor: isLoading ? 'not-allowed' : 'pointer',
+                                        opacity: isLoading ? 0.6 :1
                                     }}
                                 >
-                                    Book Appointment 
+                        {isLoading ? 'Booking...' : 'Book Appointment'} 
                                 </button>
                     </form>
     </div>

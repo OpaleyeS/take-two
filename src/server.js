@@ -3,15 +3,23 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 const app = express();
-const PORT = 5001;
+const PORT = process.env.PORT || 5001;
 
-app.use(cors());
+app.use(cors({
+    origin:'http://localhost:5173',
+    credentials: true
+
+}));
 app.use(express.json());
-
-mongoose.connect('mongodb+srv://mtsusyap@gmail:BlueAgate90+@cluster1.fwfz6f2.mongodb.net/?appName=Cluster1',{
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+//test route to verify server is working
+app.get('/api/record',(req, res) => {
+    res.json({status: 'Server is running', Timestamp:new Date()});
 });
+
+const password = encodeURIComponent('BlueAgate90+');
+const MONGODB_URI = `mongodb+srv://mtsusyap:${password}@cluster1.fwfz6f2.mongodb.net/reservationDB?appName=Cluster1`;
+
+console.log('Testing connection to:', connectionString.replace(password, '***'));
 
 //Booking Schema 
 
@@ -25,6 +33,14 @@ const bookingSchema = new mongoose.Schema({
 });
 
 const Booking = mongoose.model('Booking', bookingSchema);
+//connecting to mongodb
+mongoose.connect(MONGODB_URI)
+.then(() => {
+    console.log("MongoDB connected successfully");
+//verify if server is working 
+app.get('/api/record', (req, res) => {
+    res.json({status: "Server is Running", Timestamp: new Date()});
+});
 
 //booking endpoint
 app.post('/api/book', async(req, res) => {
@@ -32,7 +48,7 @@ app.post('/api/book', async(req, res) => {
         const { name, email, date, service, therapist} = req.body;
     //basic validation
     if(!name || !email || !date || !service || !therapist) {
-        return res.status(400).json({error: 'All field are required'});    
+        return res.status(400).json({error: 'All fields are required'});    
     } 
 //create new booking
 const booking = new Booking({
@@ -48,7 +64,7 @@ await booking.save();
 console.log('New booking created:', booking);
 
     res.status(201).json({
-        message: 'Booking succesful',
+        message: 'Booking successful',
         booking:{
             id:booking._id,
             name:booking.name,
@@ -66,7 +82,7 @@ console.log('New booking created:', booking);
 //get all bookings 
 app.get('/api/bookings', async (req, res) => {
     try{
-        const booking = await Booking.find().sort({createdAt: -1 });
+        const bookings = await Booking.find().sort({createdAt: -1 });
         res.json(bookings);
     }catch(error){
         res.status(500).json({error: 'Failed to fetch bookings'});
@@ -75,4 +91,9 @@ app.get('/api/bookings', async (req, res) => {
     app.listen(PORT,() => {
         console.log(`Server running on http://localhost:${PORT}`);
     });
+})
+.catch(err => {
+    console.error('MOngoDB connection error:', err);
+    process.exit(1);
+});
   
